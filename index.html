@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>InterestVerse — Your Anime Universe</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  PARTICLE CANVAS BACKGROUND                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  LOADING SCREEN                                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="loadingScreen">
+  <div class="loader-inner">
+    <div class="loader-kanji">宇宙</div>
+    <div class="loader-title">INTERESTVERSE</div>
+    <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+    <div class="loader-sub">Initializing your universe...</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  AUTH SCREEN                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="authScreen" class="screen hidden">
+  <div class="auth-bg-glow"></div>
+  <div class="auth-container">
+    <!-- Left panel: branding -->
+    <div class="auth-left">
+      <div class="auth-logo">
+        <span class="auth-logo-jp">インタレストバース</span>
+        <span class="auth-logo-en">INTERESTVERSE</span>
+      </div>
+      <p class="auth-tagline">Discover communities.<br/>Level up your passions.</p>
+      <div class="auth-orbs">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+      </div>
+      <div class="auth-floating-icons">
+        <span class="fi fi1">💻</span><span class="fi fi2">🎌</span>
+        <span class="fi fi3">🎮</span><span class="fi fi4">🎨</span>
+        <span class="fi fi5">📚</span><span class="fi fi6">🏋️</span>
+      </div>
+    </div>
+    <!-- Right panel: form -->
+    <div class="auth-right">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabSignIn" onclick="switchAuthTab('signin')">SIGN IN</button>
+        <button class="auth-tab" id="tabSignUp" onclick="switchAuthTab('signup')">JOIN NOW</button>
+        <div class="auth-tab-slider" id="authTabSlider"></div>
+      </div>
+
+      <!-- Sign In Form -->
+      <form class="auth-form" id="signInForm" onsubmit="handleSignIn(event)">
+        <div class="form-group">
+          <input type="text" id="siUsername" class="glow-input" placeholder=" " required/>
+          <label class="float-label">Username</label>
+          <span class="input-glow"></span>
+        </div>
+        <div class="form-group">
+          <input type="password" id="siPassword" class="glow-input" placeholder=" " required/>
+          <label class="float-label">Password</label>
+          <span class="input-glow"></span>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="rememberMe"/><label for="rememberMe">Remember me</label>
+        </div>
+        <button type="submit" class="auth-btn">
+          <span class="btn-text">ENTER THE VERSE</span>
+          <span class="btn-ripple"></span>
+        </button>
+        <p class="auth-hint">Try: <b>explorer</b> / <b>1234</b> &nbsp;or any credentials</p>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form class="auth-form hidden" id="signUpForm" onsubmit="handleSignUp(event)">
+        <div class="form-group">
+          <input type="text" id="suDisplayName" class="glow-input" placeholder=" " required/>
+          <label class="float-label">Display Name</label>
+          <span class="input-glow"></span>
+        </div>
+        <div class="form-group">
+          <input type="text" id="suUsername" class="glow-input" placeholder=" " required/>
+          <label class="float-label">Username</label>
+          <span class="input-glow"></span>
+        </div>
+        <div class="form-group">
+          <input type="email" id="suEmail" class="glow-input" placeholder=" " required/>
+          <label class="float-label">Email</label>
+          <span class="input-glow"></span>
+        </div>
+        <div class="form-group">
+          <input type="password" id="suPassword" class="glow-input" placeholder=" " required/>
+          <label class="float-label">Password</label>
+          <span class="input-glow"></span>
+          <div class="password-strength" id="passStrength"><div class="ps-bar"></div></div>
+        </div>
+        <div class="interest-picker">
+          <p class="ip-label">Pick your first interests:</p>
+          <div class="ip-chips" id="ipChips">
+            <span class="ip-chip" onclick="toggleChip(this)" data-val="Coding">💻 Coding</span>
+            <span class="ip-chip" onclick="toggleChip(this)" data-val="Anime">🎌 Anime</span>
+            <span class="ip-chip" onclick="toggleChip(this)" data-val="Gaming">🎮 Gaming</span>
+            <span class="ip-chip" onclick="toggleChip(this)" data-val="Painting">🎨 Painting</span>
+            <span class="ip-chip" onclick="toggleChip(this)" data-val="Books">📚 Books</span>
+            <span class="ip-chip" onclick="toggleChip(this)" data-val="Fitness">🏋️ Fitness</span>
+          </div>
+        </div>
+        <button type="submit" class="auth-btn">
+          <span class="btn-text">CREATE MY UNIVERSE</span>
+          <span class="btn-ripple"></span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  MAIN APP (post-login)                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="appScreen" class="screen hidden">
+
+  <!-- TOP NAV -->
+  <nav class="topnav" id="topNav">
+    <div class="nav-logo" onclick="showPage('dashboard')">
+      <span class="nav-logo-jp">宇宙</span>
+      <span class="nav-logo-en">INTERESTVERSE</span>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active" id="navDash"    onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-btn"        id="navComm"    onclick="showPage('communities')">🌐 Communities</button>
+      <button class="nav-btn"        id="navGames"   onclick="showPage('games')">🎮 Games</button>
+      <button class="nav-btn"        id="navChat"    onclick="showPage('chat')">💬 Chat</button>
+      <button class="nav-btn"        id="navProfile" onclick="showPage('profile')">🎭 Profile</button>
+    </div>
+    <div class="nav-right">
+      <div class="nav-xp-bar">
+        <span class="nav-level" id="navLevel">Lv.1</span>
+        <div class="nav-xp-track"><div class="nav-xp-fill" id="navXpFill"></div></div>
+        <span class="nav-xp-txt" id="navXpTxt">0 XP</span>
+      </div>
+      <div class="nav-avatar" onclick="showPage('profile')">
+        <span id="navAvatarEmoji">🦊</span>
+      </div>
+      <button class="nav-logout" onclick="logout()">⏻</button>
+    </div>
+  </nav>
+
+  <!-- PAGE: DASHBOARD -->
+  <div class="page" id="pageDashboard">
+    <div class="dash-hero">
+      <div class="dash-welcome">
+        <p class="dash-greeting" id="dashGreeting">Hey Explorer 👋</p>
+        <h1 class="dash-title">Your <span class="grad-text">Universe</span> Awaits</h1>
+        <p class="dash-sub">Dive into communities, level up, and connect.</p>
+        <div class="dash-hero-btns">
+          <button class="hero-btn primary" onclick="showPage('communities')">Explore Communities</button>
+          <button class="hero-btn secondary" onclick="randomInterest()">✨ Surprise Me</button>
+        </div>
+      </div>
+      <div class="dash-hero-art">
+        <div class="hero-ring"></div>
+        <div class="hero-avatar-wrap">
+          <span class="hero-avatar-emoji" id="heroAvatarEmoji">🦊</span>
+        </div>
+        <div class="hero-stat-badges">
+          <div class="hsb hsb1"><span id="hsbJoined">0</span><small>Joined</small></div>
+          <div class="hsb hsb2"><span id="hsbLevel">1</span><small>Level</small></div>
+          <div class="hsb hsb3"><span id="hsbXP">0</span><small>XP</small></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Challenge -->
+    <section class="dash-section">
+      <h2 class="section-title"><span class="title-bar"></span> Daily Challenges</h2>
+      <div class="challenges-row" id="challengesRow"></div>
+    </section>
+
+    <!-- Community Cards -->
+    <section class="dash-section">
+      <h2 class="section-title"><span class="title-bar"></span> Your Communities</h2>
+      <div class="community-grid" id="communityGrid"></div>
+    </section>
+
+    <!-- Trending -->
+    <section class="dash-section">
+      <h2 class="section-title"><span class="title-bar"></span> 🔥 Trending Now</h2>
+      <div class="trending-list" id="trendingList"></div>
+    </section>
+  </div>
+
+  <!-- PAGE: COMMUNITIES -->
+  <div class="page hidden" id="pageCommunities">
+    <div class="page-header">
+      <h1>🌐 Communities</h1>
+      <p>Find your tribe. Every passion has a home here.</p>
+    </div>
+    <div class="comm-search-row">
+      <input type="text" class="comm-search" id="commSearch" placeholder="Search communities..." oninput="filterComm()"/>
+      <div class="comm-filters" id="commFilters">
+        <button class="cf-btn active" onclick="filterCommTag(this,'all')">All</button>
+        <button class="cf-btn" onclick="filterCommTag(this,'tech')">Tech</button>
+        <button class="cf-btn" onclick="filterCommTag(this,'creative')">Creative</button>
+        <button class="cf-btn" onclick="filterCommTag(this,'lifestyle')">Lifestyle</button>
+        <button class="cf-btn" onclick="filterCommTag(this,'games')">Games</button>
+      </div>
+    </div>
+    <div class="all-comm-grid" id="allCommGrid"></div>
+  </div>
+
+  <!-- PAGE: COMMUNITY ROOM -->
+  <div class="page hidden" id="pageCommunityRoom">
+    <div class="room-header" id="roomHeader">
+      <button class="back-btn" onclick="showPage('communities')">← Back</button>
+      <div class="room-title-wrap">
+        <span class="room-icon" id="roomIcon"></span>
+        <div>
+          <h2 class="room-title" id="roomTitle"></h2>
+          <p class="room-sub" id="roomSub"></p>
+        </div>
+      </div>
+      <button class="join-room-btn" id="joinRoomBtn" onclick="toggleJoinRoom()">Join Community</button>
+    </div>
+    <div class="room-body">
+      <!-- Post composer -->
+      <div class="post-composer">
+        <div class="pc-avatar"><span id="pcAvatar">🦊</span></div>
+        <div class="pc-right">
+          <textarea class="pc-input" id="pcInput" placeholder="Share something with the community..."></textarea>
+          <div class="pc-actions">
+            <span class="pc-emoji-btn" onclick="toggleEmojiPicker()">😊</span>
+            <div class="emoji-picker hidden" id="emojiPicker">
+              😊 🔥 💯 🎉 🚀 ✨ 💻 🎮 🎨 📚 🎌 🏋️
+            </div>
+            <button class="pc-post-btn" onclick="postContent()">POST</button>
+          </div>
+        </div>
+      </div>
+      <!-- Posts feed -->
+      <div class="posts-feed" id="postsFeed"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: GAMES -->
+  <div class="page hidden" id="pageGames">
+    <div class="page-header">
+      <h1>🎮 Mini Games</h1>
+      <p>Challenge yourself. Earn XP. Prove your worth.</p>
+    </div>
+    <div class="games-hub" id="gamesHub">
+      <div class="game-card" onclick="launchGame('click')">
+        <div class="gc-icon">⚡</div>
+        <h3>Click Warrior</h3>
+        <p>How fast can you click? Beat the record!</p>
+        <div class="gc-badge">+50 XP</div>
+      </div>
+      <div class="game-card" onclick="launchGame('memory')">
+        <div class="gc-icon">🧠</div>
+        <h3>Memory Realm</h3>
+        <p>Match the anime-themed cards before time runs out.</p>
+        <div class="gc-badge">+80 XP</div>
+      </div>
+      <div class="game-card" onclick="launchGame('reaction')">
+        <div class="gc-icon">⚔️</div>
+        <h3>Reaction Blade</h3>
+        <p>Hit the target the instant it appears. Fastest wins.</p>
+        <div class="gc-badge">+60 XP</div>
+      </div>
+    </div>
+
+    <!-- GAME: Click Warrior -->
+    <div class="game-panel hidden" id="gameClick">
+      <button class="back-btn" onclick="closeGame()">← Games</button>
+      <h2>⚡ Click Warrior</h2>
+      <div class="click-game">
+        <div class="cg-stats">
+          <div class="cg-stat"><span id="cgClicks">0</span><small>Clicks</small></div>
+          <div class="cg-stat"><span id="cgTimer">10</span><small>Seconds</small></div>
+          <div class="cg-stat"><span id="cgBest">0</span><small>Best</small></div>
+        </div>
+        <button class="click-target" id="clickTarget" onclick="registerClick()">SMASH ME!</button>
+        <button class="game-start-btn" id="clickStartBtn" onclick="startClickGame()">START GAME</button>
+        <div class="game-result hidden" id="clickResult"></div>
+      </div>
+    </div>
+
+    <!-- GAME: Memory Realm -->
+    <div class="game-panel hidden" id="gameMemory">
+      <button class="back-btn" onclick="closeGame()">← Games</button>
+      <h2>🧠 Memory Realm</h2>
+      <div class="memory-game">
+        <div class="mg-stats">
+          <div class="cg-stat"><span id="mgMoves">0</span><small>Moves</small></div>
+          <div class="cg-stat"><span id="mgMatches">0</span><small>Matches</small></div>
+          <div class="cg-stat"><span id="mgTimer">60</span><small>Time</small></div>
+        </div>
+        <div class="memory-grid" id="memoryGrid"></div>
+        <button class="game-start-btn" id="memoryStartBtn" onclick="startMemoryGame()">START GAME</button>
+        <div class="game-result hidden" id="memoryResult"></div>
+      </div>
+    </div>
+
+    <!-- GAME: Reaction Blade -->
+    <div class="game-panel hidden" id="gameReaction">
+      <button class="back-btn" onclick="closeGame()">← Games</button>
+      <h2>⚔️ Reaction Blade</h2>
+      <div class="reaction-game">
+        <div class="cg-stats">
+          <div class="cg-stat"><span id="rgBest">—</span><small>Best (ms)</small></div>
+          <div class="cg-stat"><span id="rgLast">—</span><small>Last (ms)</small></div>
+          <div class="cg-stat"><span id="rgRound">0/5</span><small>Round</small></div>
+        </div>
+        <div class="reaction-arena" id="reactionArena">
+          <div class="ra-msg" id="raMsg">Press START to begin</div>
+          <div class="ra-target hidden" id="raTarget" onclick="hitTarget()">⚔️</div>
+        </div>
+        <button class="game-start-btn" id="reactionStartBtn" onclick="startReactionGame()">START GAME</button>
+        <div class="game-result hidden" id="reactionResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: CHAT -->
+  <div class="page hidden" id="pageChat">
+    <div class="chat-layout">
+      <div class="chat-sidebar">
+        <h3 class="cs-title">💬 Rooms</h3>
+        <div class="chat-rooms" id="chatRooms"></div>
+      </div>
+      <div class="chat-main">
+        <div class="chat-header" id="chatHeader">
+          <span id="chatRoomName">Select a room</span>
+          <span class="chat-online"><span class="online-dot"></span><span id="chatOnline">0 online</span></span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-empty">← Pick a chat room to start</div>
+        </div>
+        <div class="chat-input-row">
+          <div class="chat-emoji-btn" onclick="insertChatEmoji()">😊</div>
+          <input type="text" class="chat-input" id="chatInput" placeholder="Send a message..." onkeydown="chatKeydown(event)"/>
+          <button class="chat-send-btn" onclick="sendChatMessage()">➤</button>
+        </div>
+        <div class="typing-indicator hidden" id="typingIndicator">
+          <span></span><span></span><span></span> <small id="typingName">Someone</small> is typing...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: PROFILE -->
+  <div class="page hidden" id="pageProfile">
+    <div class="profile-wrap">
+      <!-- Avatar card -->
+      <div class="profile-card">
+        <div class="profile-ring">
+          <div class="profile-avatar" id="profileAvatar">
+            <span id="profileAvatarEmoji">🦊</span>
+          </div>
+        </div>
+        <h2 class="profile-name" id="profileName">Explorer</h2>
+        <p class="profile-username" id="profileUsername">@explorer</p>
+        <div class="profile-level-badge" id="profileLevelBadge">Level 1 · Novice</div>
+        <div class="profile-xp-bar">
+          <div class="pxp-fill" id="profileXpFill"></div>
+        </div>
+        <p class="pxp-txt" id="profileXpTxt">0 / 500 XP</p>
+        <!-- Avatar picker -->
+        <div class="avatar-picker">
+          <p class="ap-label">Choose Avatar</p>
+          <div class="ap-grid" id="apGrid"></div>
+        </div>
+      </div>
+
+      <!-- Stats & interests -->
+      <div class="profile-right">
+        <div class="profile-stats-grid">
+          <div class="ps-card"><span id="psJoined">0</span><small>Communities</small></div>
+          <div class="ps-card"><span id="psPosts">0</span><small>Posts</small></div>
+          <div class="ps-card"><span id="psLikes">0</span><small>Likes Given</small></div>
+          <div class="ps-card"><span id="psGames">0</span><small>Games Played</small></div>
+        </div>
+
+        <!-- Editable info -->
+        <div class="profile-edit-card">
+          <h3>Edit Profile</h3>
+          <div class="pe-row">
+            <label>Display Name</label>
+            <input type="text" class="pe-input" id="peDisplayName" placeholder="Your name"/>
+          </div>
+          <div class="pe-row">
+            <label>Bio</label>
+            <textarea class="pe-input pe-bio" id="peBio" placeholder="Tell the verse about you..."></textarea>
+          </div>
+          <div class="pe-row">
+            <label>Favorite Kanji</label>
+            <input type="text" class="pe-input" id="peKanji" placeholder="e.g. 力" maxlength="2"/>
+          </div>
+          <button class="pe-save-btn" onclick="saveProfile()">Save Changes</button>
+        </div>
+
+        <!-- Joined communities -->
+        <div class="profile-communities">
+          <h3>My Communities</h3>
+          <div class="pc-chips" id="profileCommChips"></div>
+        </div>
+
+        <!-- Achievement badges -->
+        <div class="profile-achievements">
+          <h3>🏅 Achievements</h3>
+          <div class="ach-grid" id="achGrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end appScreen -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  TOAST / NOTIFICATION                                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  FLOATING REACTIONS                                        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="floatReactions"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
