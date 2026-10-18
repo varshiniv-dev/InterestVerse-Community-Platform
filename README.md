@@ -1,1 +1,1 @@
-https://varshiniv-dev.github.io/ibcs/
+(https://varshiniv-dev.github.io/InterestVerse-Community-Platform/)
